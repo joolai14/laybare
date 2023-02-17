@@ -1,104 +1,45 @@
 <?php
-
+include('functions/list_of_functions.php');
 if(isset($_POST['cmdType'])){
     $cmdType = $_POST['cmdType'];
 
-    if($cmdType == "getEntries"){
-		// $actiont = $_POST["actiont"];
+    if($cmdType == "getData"){
 		$action = new myaction();
-        $result = $action->getEntries();  
+		$id = $_POST['id'];
+        $result = $action->getData($id);  
 		echo json_encode($result);
     }
-};
-
+}
 
 class myaction {
-	public function getEntries(){
-		$dbhost = "localhost";
-		$dbuser = "root";
-		$dbpass = "";
-		$db = "menorian";
-		$conn = new mysqli($dbhost, $dbuser, $dbpass,$db) or die("Connect failed: %s\n". $conn -> error);	
-		
-	$sql = "
-		SELECT mr.*, sa.id as sid, sa.invoicenumber
-		FROM 
-			mr_monitorings as mr
-		LEFT JOIN 
-			mr_statementofaccounts as sa ON mr.id = sa.monitoring_id
-		
-		ORDER BY
-			mr.id DESC 
-		"; 
 	
-	$result = $conn->query($sql);
-	$types = array('', 'Import', 'Export', 'Trucking');
-	
-	$d = '
-            <thead>
-				<tr>
-                    <th></th>
-                    <th>Type</th>
-                   <th></th>
-                                            
-                                            <th>Date</th>
-                                            <th>Client</th>
-                                            <th>Weight</th>
-                                            <th>Size of Cargo</th>
-                                            <th># of Container</th>
-                                            <th>PRO Number</th>
-                                            <th>Client DR Number</th>
-                                        </tr>
-                                    </thead>
-                                    <tfoot>
-                                        <tr>
-                                            <th></th>
-                                            <th>TQype</th>
-                                            <th></th>
-                                            <th>Date</th>
-                                            <th>Client</th>
-                                            <th>Weight</th>
-                                            <th>Size of Cargo</th>
-                                            <th># of Container</th>
-                                            <th>PRO Number</th>
-                                            <th>Client DR Number</th>
-                                        </tr>
-                                    </tfoot>
-                                    <tbody>
-                                   ';
-
-									while($row = $result->fetch_assoc()) {
-		if(!empty($row['type'])){
-			$type_e = $types[$row['type']];
-		}else{
-			$type_e = '';
-		}
-		
-		$d .= '<tr>';
-			$d .= '<td>';
-				if($soaid == 0){
-					$d . '<a href="" class="btn btn-sm btn-primary">Create SOA</a>';
-				}else{
-					$d . '<a href="" class="btn btn-sm btn-primary">Update SOA</a>';
-				}
-				$d . '<a href="" class="btn btn-sm btn-primary">Update Details</a>';
-			$d .= '</td>';
-			$d .= '<td>' . $type_e . '</td>';
-			$d .= '<td></td>';
-			$d .= '<td>' . date('F j, Y', strtotime($row['date'])) . '</td>';
-			$d .= '<td>' . $row['client'] . '</td>';
-			$d .= '<td>' . $row['weight'] . '</td>';
-			$d .= '<td>' . $row['SizeOfCargo'] . '</td>';
-			$d .= '<td>' . $row['numberOfContainer'] . '</td>';
-			$d .= '<td>' . $row['PRONumber'] . '</td>';
-			$d .= '<td>' . $row['clientDRNumber'] . '</td>';
-		$d .= '</tr>';
-	};
-								$d .= '
-                                    </tbody>
-                                ';
-	
-		
+	public function getData($id){
+		$conn = databaseConnect();
+		//FETCH DATA
+		$result = $conn->query("SELECT *FROM jf_products where id = " . $id);
+		$d = '<table class="table">';
+			while($row = $result->fetch_assoc()) {	
+				$d .= '<tr>';
+					$d .= "<th>ID</th>";
+					$d .= "<td>".$row['id']."</td>";
+				$d .= '</tr>';
+				$d .= '<tr>';
+					$d .= "<th>Name</th>";
+					$d .= "<td>".$row['Name']."</td>";
+				$d .= '</tr>';
+				$d .= '<tr>';
+					$d .= "<th>Description</th>";
+					$d .= "<td>".$row['Description']."</td>";
+				$d .= '</tr>';
+				$d .= '<tr>';
+					$d .= "<th>Price</th>";
+					$d .= "<td>".$row['Price']."</td>";
+				$d .= '</tr>';
+				$d .= '<tr>';
+					$d .= "<th colspan='2'><a href='products.php?id=".$row['id']."&update=1' class='btn btn-primary'><i class='fa fa-edit' aria-hidden='true'></i> Update</a></th>";
+				$d .= '</tr>';
+			}
+		$d .= "</table>";
 		return $d;
-	}}
-
+	}
+}
