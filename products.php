@@ -6,7 +6,7 @@ $conn = databaseConnect();
 
 
 if(isset($_POST['saveData'])){
-	echo $sql = "INSERT into jf_products (Name, Description, Price, status) VALUES ('".$_POST['Name']."', '".$_POST['Description']."', ".$_POST['Price'].",1)";
+	$sql = "INSERT into jf_products (Name, Description, Price, status) VALUES ('".$_POST['Name']."', '".$_POST['Description']."', ".$_POST['Price'].",1)";
 	if (mysqli_query($conn, $sql)) {
 	  // $last_id = mysqli_insert_id($conn);
 	  // echo "New record created successfully. Last inserted ID is: " . $last_id;
@@ -44,23 +44,23 @@ if(isset($_POST['saveData'])){
 									<table class="table-sm" cellspacing="0" role="grid" style="width: 100%;">
 										<tr>
 											<td>Product Name</td>
-											<td><input type="input" name="Name" class="form-control"></td>
+											<td><input type="input" name="Name" class="form-control" required></td>
 										</tr>
 										<tr>
 											<td>Description</td>
 											<td>
-												<textarea name="Description" class="form-control"></textarea>
+												<textarea name="Description" class="form-control" required></textarea>
 											</td>
 										</tr>
 										<tr>
 											<td>Price</td>
-											<td><input type="decimal" name="Price" class="form-control"></td>
+											<td><input type="decimal" name="Price" class="form-control" onchange="checkIfNumber();" id="Total" required></td>
 										</tr>
 									</table>
 								</div>
 								<div class="modal-footer">
 									<button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
-									<input type="submit" name="saveData" class="btn btn-primary btn-sm" value="Save Data">
+									<input type="submit" name="saveData" class="btn btn-primary btn-sm" value="Save Data" id="myBtn" disabled>
 									
 								</div>
 								</form>
@@ -101,8 +101,9 @@ if(isset($_POST['saveData'])){
 												// echo '<td>' . $status[$row['status']] . '</td>';
 												echo '<td>';
 													// echo '<a href="feed_management.php?id='.$row['id'].'&update=1"><i class="fa fa-edit" aria-hidden="true"></i></a>';
+													echo '<a href="products.php?id='.$row['id'].'&update=1"><i class="fa fa-view" aria-hidden="true"></i></a>&nbsp;&nbsp;';
 													echo '<a href="products.php?id='.$row['id'].'&update=1"><i class="fa fa-edit" aria-hidden="true"></i></a>&nbsp;&nbsp;';
-													echo "<small><a href='delete_record.php?id=".$row['id']."&table=jf_influencers&redirect=feeds.php' onclick='return confirm(\"Are you sure you want to submit this data?\");'><i class='fa fa-trash' aria-hidden='true'></i></a></small>";
+													echo "<small><a href='delete_record.php?id=".$row['id']."&table=jf_peoducts&redirect=products.php' onclick='return confirm(\"Are you sure you want to submit this data?\");'><i class='fa fa-trash' aria-hidden='true'></i></a></small>";
 												echo '</td>';
 											echo '</tr>';
 										}
@@ -122,3 +123,18 @@ if(isset($_POST['saveData'])){
 <?php include('includes/footer.php'); ?>
 <script src="vendor/datatables/jquery.dataTables.min.js"></script>
 <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+<script type="text/javascript">
+function checkIfNumber(){
+	var string = document.getElementById("Total").value;
+	string = parseFloat(string);
+	
+	if ((typeof string === 'number' && !isNaN(string) && string !== Infinity && string !== -Infinity) || (typeof string === 'string' && /^\-?[0-9]+(e[0-9]+)?(\.[0-9]+)?$/.test(string))) {
+		document.getElementById("myBtn").disabled = false;
+	}else{
+		document.getElementById("myBtn").disabled = true;
+		console.log(string);
+	}
+}
+
+</script>
